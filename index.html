@@ -1,0 +1,627 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Jeu de Noël 🎄</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: linear-gradient(135deg, #000000, #ff4fa3);
+      color: #ffffff;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+    }
+
+    .container {
+      background: rgba(0, 0, 0, 0.7);
+      border-radius: 16px;
+      padding: 24px 28px;
+      max-width: 700px;
+      width: 90%;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7);
+      text-align: center;
+      border: 1px solid #ff8ac8;
+    }
+
+    .header-photo {
+      width: 100%;
+      max-width: 600px;
+      border-radius: 16px;
+      margin-bottom: 20px;
+      box-shadow: 0 0 15px rgba(0,0,0,0.6);
+    }
+
+    .question-gif {
+      width: 100%;
+      max-width: 400px;
+      border-radius: 12px;
+      margin: 15px auto;
+      display: block;
+      box-shadow: 0 0 10px rgba(0,0,0,0.5);
+    }
+
+    h1 {
+      margin-top: 0;
+      font-size: 1.8rem;
+    }
+
+    h2 {
+      font-size: 1.3rem;
+      margin-bottom: 12px;
+    }
+
+    p { line-height: 1.5; }
+
+    .btn {
+      background: #ff4fa3;
+      border: none;
+      border-radius: 999px;
+      padding: 10px 20px;
+      margin: 8px 6px;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: transform 0.1s ease, box-shadow 0.1s ease, background 0.2s;
+      color: #000;
+      font-weight: bold;
+    }
+
+    .btn:hover {
+      background: #ff8ac8;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+    }
+
+    .btn:active {
+      transform: translateY(0);
+      box-shadow: none;
+    }
+
+    .input-row { margin-top: 12px; }
+
+    input[type="text"] {
+      padding: 8px 10px;
+      border-radius: 8px;
+      border: none;
+      width: 70%;
+      max-width: 260px;
+      margin-bottom: 8px;
+    }
+
+    .message {
+      margin-top: 10px;
+      min-height: 22px;
+      font-weight: bold;
+    }
+
+    .message.error { color: #ff8585; }
+    .message.success { color: #9effa1; }
+
+    .step {
+      display: none;
+      animation: fadeIn 0.3s ease;
+    }
+
+    .step.active { display: block; }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(5px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .final {
+      font-size: 1.4rem;
+      margin-top: 10px;
+    }
+
+    .small {
+      font-size: 0.9rem;
+      opacity: 0.9;
+    }
+
+    .code-panel {
+      margin: 12px auto 18px auto;
+      padding: 10px 14px;
+      border-radius: 12px;
+      background: rgba(255, 255, 255, 0.08);
+      display: inline-block;
+      font-weight: bold;
+      letter-spacing: 4px;
+      border: 1px solid #ff8ac8;
+    }
+
+    .code-panel span {
+      font-family: "Courier New", monospace;
+      font-size: 1.2rem;
+    }
+
+    .gif-try-again {
+      display: none;
+      width: 180px;
+      margin: 15px auto;
+      border-radius: 12px;
+    }
+
+    .success-gif {
+      width: 100%;
+      max-width: 400px;
+      border-radius: 12px;
+      margin: 20px auto;
+      display: block;
+    }
+
+    .credits {
+      margin-top: 18px;
+      font-size: 0.85rem;
+      opacity: 0.8;
+      color: #ffcce8;
+    }
+
+    /* MISSION SECRÈTE */
+    .mission-step {
+      display: none;
+      animation: fadeIn 0.3s ease;
+    }
+    .mission-step.active { display: block; }
+
+    .mission-image {
+      width: 100%;
+      max-width: 450px;
+      border-radius: 16px;
+      margin: 14px auto;
+      display: block;
+      box-shadow: 0 0 15px rgba(0,0,0,0.7);
+    }
+
+    ul {
+      text-align: left;
+      margin: 8px auto;
+      max-width: 520px;
+    }
+
+    @media (max-width: 768px) {
+      .container {
+        padding: 16px;
+        width: 95%;
+      }
+
+      input[type="text"] {
+        width: 90%;
+      }
+
+      .btn {
+        padding: 12px 20px;
+        font-size: 1.1rem;
+      }
+
+      .question-gif, .success-gif, .mission-image {
+        max-width: 320px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- Photo d’accueil au début -->
+    <img src="20241231_210951.jpg" alt="Famille" class="header-photo" id="headerPhoto">
+
+    <h1>Jeu de Noël pour Gladys 🎄</h1>
+
+    <div class="code-panel">
+      <div>Chiffres du code découverts :</div>
+      <span id="codePanelText">_ _ _</span>
+    </div>
+
+    <img id="gifTryAgain" class="gif-try-again" src="tryagain.gif" alt="Try again">
+
+    <!-- INTRO -->
+    <div id="step0" class="step active">
+      <p>
+        Bonjour <strong>Gladys</strong> !<br>
+        Ton cadeau est enfermé dans une serrure magique 🔐<br>
+        Pour l'ouvrir, tu dois répondre à plusieurs questions.
+      </p>
+      <p>Chaque bonne réponse te donne un chiffre du code.</p>
+      <button class="btn" onclick="goToStep(1)">Commencer ✨</button>
+    </div>
+
+    <!-- Q1 -->
+    <div id="step1" class="step">
+      <h2>Question 1</h2>
+      <p>
+        Qui est le personnage féminin Disney préféré de <strong>Kévin Gégé</strong> ?
+      </p>
+      <img src="Disney.gif" alt="Disney" class="question-gif">
+      <div class="input-row">
+        <input type="text" id="answer1" placeholder="Écris la réponse ici">
+      </div>
+      <button class="btn" onclick="checkQ1()">Valider</button>
+      <div id="msg1" class="message"></div>
+    </div>
+
+    <!-- Q2 -->
+    <div id="step2" class="step">
+      <h2>Question 2</h2>
+      <p>
+        Quel est le Pokémon préféré de <strong>Bryan Gégé</strong> ?
+      </p>
+      <img src="dracaufeu.gif" alt="Dracaufeu" class="question-gif">
+      <div>
+        <button class="btn" onclick="checkQ2('carapuce')">Carapuce</button>
+        <button class="btn" onclick="checkQ2('pikachu')">Pikachu</button>
+        <button class="btn" onclick="checkQ2('dracaufeu')">Dracaufeu</button>
+      </div>
+      <div id="msg2" class="message"></div>
+    </div>
+
+    <!-- Q2bis -->
+    <div id="step2bis" class="step">
+      <h2>Question 2 bis</h2>
+      <p>
+        Quel est le nom de la collection de cartes que ton papa collectionne ?
+      </p>
+      <img src="Collect.gif" alt="Collection" class="question-gif">
+      <div class="input-row">
+        <input type="text" id="answer2bis" placeholder="Écris la réponse ici">
+      </div>
+      <button class="btn" onclick="checkQ2bis()">Valider</button>
+      <div id="msg2bis" class="message"></div>
+    </div>
+
+    <!-- Q3 -->
+    <div id="step3" class="step">
+      <h2>Question 3</h2>
+      <p>
+        Énigme :<br><br>
+        <em>
+        Je trotte dans tes histoires et dans tes jeux,<br>
+        parfois sur papier, parfois dans tes rêves un peu brumeux.<br>
+        Je suis ton cheval préféré, celui que tu aimes tant nommer…<br>
+        Quel est mon nom ?
+        </em>
+      </p>
+      <img src="horse.gif" alt="Cheval" class="question-gif">
+      <div class="input-row">
+        <input type="text" id="answer3" placeholder="Réponse de l'énigme">
+      </div>
+      <button class="btn" onclick="checkQ3()">Valider</button>
+      <div id="msg3" class="message"></div>
+    </div>
+
+    <!-- Succès après Q3 -->
+    <div id="stepSuccess" class="step">
+      <h2>Bravo ! 🎉</h2>
+      <img src="congrat.gif" alt="Félicitations" class="success-gif">
+      <p>
+        Tu as maintenant tous les chiffres du code !<br>
+        Prépare-toi à ouvrir ton cadeau...
+      </p>
+      <button class="btn" onclick="goToStep(4)">Ouvrir le cadeau 🎁</button>
+    </div>
+
+    <!-- SERRURE / CODE FINAL -->
+    <div id="step4" class="step">
+      <h2>La serrure magique 🔐</h2>
+      <img src="opengift.gif" alt="Ouvre le cadeau" class="success-gif">
+      <p>
+        Tu as maintenant tous les chiffres du code.<br>
+        Recopie-les dans le bon ordre pour déverrouiller ton cadeau !
+      </p>
+      <div class="input-row">
+        <input type="text" id="finalCode" placeholder="Ex : 482 (sans espaces)">
+      </div>
+      <button class="btn" onclick="checkFinalCode()">Ouvrir le cadeau 🎁</button>
+      <div id="msg4" class="message"></div>
+    </div>
+
+    <!-- FIN + bouton Mission -->
+    <div id="step5" class="step">
+      <h2>Bravo, mission réussie ! 🎉</h2>
+      <img src="congratz.gif" alt="Félicitations" class="success-gif">
+      <p class="final">
+        Félicitations <strong>Gladys</strong>, tu as trouvé le code secret ! 🎁
+      </p>
+      <p class="small">
+        <strong>Avant d’ouvrir les cadeaux</strong>, il y a des <strong>missions secrètes</strong><br>
+        que <strong>toi seule as le droit de lire</strong> 🔐<br>
+        Quand tu auras terminé toutes les missions, tu pourras ouvrir les cadeaux.
+      </p>
+      <button class="btn" onclick="startMission()">
+        Accéder à la Mission Secrète 🔐
+      </button>
+    </div>
+
+    <!-- PAGE MISSION SECRÈTE (dans le même fichier) -->
+    <div id="step6" class="step">
+      <h2>Mission Secrète de Répartition des Cadeaux 🎁</h2>
+      <p class="small">
+        Cette mission est réservée à <strong>Gladys</strong>. Tu vas distribuer les cadeaux un par un.
+      </p>
+
+      <!-- Étape 1 -->
+      <div id="mission1" class="mission-step active">
+        <h2>Étape 1</h2>
+        <img src="sylvanian.jpg" alt="Cadeau Sylvanian" class="mission-image">
+        <p>
+          Le premier cadeau, c’est <strong>exactement ce que tu as demandé</strong> : des <strong>Sylvanian</strong> 🐰🏡<br>
+          Tu peux le prendre, c’est <strong>ton cadeau</strong> 💖
+        </p>
+      </div>
+
+      <!-- Étape 2 -->
+      <div id="mission2" class="mission-step">
+        <h2>Étape 2</h2>
+        <img src="tata.png" alt="Cadeau parfum pour Maman" class="mission-image">
+        <p>
+          Trouve le cadeau <strong>parfumé</strong> 🌸<br>
+          Ce cadeau est pour ta <strong>Maman</strong>.<br><br>
+          Ta mission : <strong>lui donner le parfum</strong>, lui faire un <strong>gros câlin</strong><br>
+          et lui souhaiter un très <strong>Joyeux Noël</strong>❤️
+        </p>
+      </div>
+
+      <!-- Étape 3 -->
+      <div id="mission3" class="mission-step">
+        <h2>Étape 3</h2>
+        <img src="Carte.png" alt="Carte cadeau" class="mission-image">
+        <p>
+          Prends la <strong>carte cadeau</strong> 💳 et <strong>donne-la à Papa</strong>.<br><br>
+          Quand tu es avec Papa, <strong>tous les deux ensemble</strong>, appuyez sur le bouton ci-dessous
+          pour découvrir ce que vous pouvez acheter avec cette carte.
+        </p>
+
+        <button id="cardBtn" class="btn" onclick="showCardDetails()">
+          Découvrir la mission de la carte 🎴
+        </button>
+
+        <div id="cardDetails" style="display:none; margin-top:12px;">
+          <img src="Bertil.jpg" alt="Bertil" class="mission-image">
+          <img src="Gladys.jpg" alt="Gladys" class="mission-image">
+
+          <p>
+            Avec ce bon cadeau, tu vas pouvoir, avec <strong>Papa</strong>, aller acheter :
+          </p>
+          <ul>
+            <li>le <strong>LEGO du Bonzaï</strong> 🌸</li>
+            <li>et un <strong>LEGO Heihei</strong> de <strong>Vaiana</strong> 🐔</li>
+          </ul>
+          <p>
+            <strong>Défi :</strong> la mission sera validée quand tu auras pris une
+            <strong>photo avec les cadeaux, en présence de Papa et toi</strong> 📸
+          </p>
+        </div>
+      </div>
+
+      <button id="nextBtn" class="btn" onclick="nextMission()">
+        Mission suivante ▶️
+      </button>
+    </div>
+
+    <p class="credits">
+      Réalisé par Kévin CHEN – idée de Anthony YANG
+    </p>
+  </div>
+
+  <script>
+    const secretDigits = ['4', '8', '2'];
+    let unlockedDigits = 0;
+    let triesQ2 = 0;
+
+    let currentMission = 1;
+    const maxMission = 3;
+
+    function updateCodePanel() {
+      const display = secretDigits
+        .map((d, i) => (i < unlockedDigits ? d : '_'))
+        .join(' ');
+      document.getElementById('codePanelText').textContent = display;
+    }
+
+    function showTryAgainGif() {
+      const gif = document.getElementById('gifTryAgain');
+      if (gif) gif.style.display = 'block';
+    }
+
+    function hideTryAgainGif() {
+      const gif = document.getElementById('gifTryAgain');
+      if (gif) gif.style.display = 'none';
+    }
+
+    updateCodePanel();
+
+    function goToStep(stepNumber) {
+      const steps = document.querySelectorAll('.step');
+      steps.forEach(step => step.classList.remove('active'));
+      const current = document.getElementById('step' + stepNumber);
+      if (current) current.classList.add('active');
+      hideTryAgainGif();
+    }
+
+    function revealDigit(position) {
+      unlockedDigits = Math.max(unlockedDigits, position);
+      updateCodePanel();
+    }
+
+    function checkQ1() {
+      const input = document.getElementById('answer1');
+      const msg = document.getElementById('msg1');
+      const value = input.value.trim().toLowerCase();
+      msg.classList.remove('error', 'success');
+
+      const normalized = value
+        .replace(/[’']/g, "'")
+        .normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+
+      const validAnswers = [
+        "elsa d'arendelle",
+        "elsa d arendelle",
+        "elsa d arenelle",
+        "elsa",
+        "la reine elsa",
+        "reine elsa",
+        "elsa d'arendel",
+        "elsa arendelle"
+      ];
+
+      if (validAnswers.includes(normalized)) {
+        hideTryAgainGif();
+        revealDigit(1);
+        msg.textContent = 'Bravo ! 1er chiffre du code : ' + secretDigits[0];
+        msg.classList.add('success');
+        setTimeout(() => goToStep(2), 1200);
+      } else {
+        msg.textContent = 'Indice : c\'est ton premier cadeau, mais tu dois écrire son prénom ET son nom.';
+        msg.classList.add('error');
+        showTryAgainGif();
+      }
+    }
+
+    function checkQ2(answer) {
+      const msg = document.getElementById('msg2');
+      msg.classList.remove('error', 'success');
+
+      if (answer === 'carapuce') {
+        hideTryAgainGif();
+        revealDigit(2);
+        msg.textContent = 'Yes ! 2ᵉ chiffre du code : ' + secretDigits[1];
+        msg.classList.add('success');
+        setTimeout(() => goToStep(3), 1200);
+      } else {
+        triesQ2++;
+        showTryAgainGif();
+
+        let baseMessage = 'Mauvaise réponse…';
+
+        if (answer === 'dracaufeu') {
+          baseMessage = 'Dracaufeu, c\'est le préféré de Kévin, pas celui de Bryan 😉';
+        } else if (answer === 'pikachu') {
+          baseMessage = 'Pikachu, c\'est le Pokémon principal, mais pas le préféré de Bryan.';
+        }
+
+        if (triesQ2 >= 2) {
+          msg.textContent = baseMessage + ' 2 essais ratés… on passe à une autre question !';
+          msg.classList.add('error');
+          setTimeout(() => goToStep('2bis'), 1200);
+        } else {
+          msg.textContent = baseMessage + ' Il te reste 1 essai !';
+          msg.classList.add('error');
+        }
+      }
+    }
+
+    function checkQ2bis() {
+      const input = document.getElementById('answer2bis');
+      const msg = document.getElementById('msg2bis');
+      const clean = input.value.trim().toLowerCase();
+      msg.classList.remove('error', 'success');
+
+      if (clean === 'crados' || clean === 'les crados') {
+        hideTryAgainGif();
+        revealDigit(2);
+        msg.textContent = 'Bien joué ! 2ᵉ chiffre du code : ' + secretDigits[1];
+        msg.classList.add('success');
+        setTimeout(() => goToStep(3), 1200);
+      } else {
+        msg.textContent = 'Regarde bien la collection de cartes de ton papa…';
+        msg.classList.add('error');
+        showTryAgainGif();
+      }
+    }
+
+    function checkQ3() {
+      const input = document.getElementById('answer3');
+      const msg = document.getElementById('msg3');
+      const value = input.value.trim().toLowerCase();
+      msg.classList.remove('error', 'success');
+
+      if (value === 'belloween') {
+        hideTryAgainGif();
+        revealDigit(3);
+        msg.textContent = 'Parfait ! 3ᵉ chiffre du code : ' + secretDigits[2];
+        msg.classList.add('success');
+        setTimeout(() => goToStep('Success'), 1200);
+      } else {
+        msg.textContent = 'Ce n\'est pas ça… pense à ton cheval préféré 😉';
+        msg.classList.add('error');
+        showTryAgainGif();
+      }
+    }
+
+    function checkFinalCode() {
+      const input = document.getElementById('finalCode');
+      const msg = document.getElementById('msg4');
+      const value = input.value.trim().replace(/\s/g, '');
+      const correctCode = secretDigits.join('');
+      msg.classList.remove('error', 'success');
+
+      if (value === '') {
+        msg.textContent = 'Écris le code avant de valider 🙂';
+        msg.classList.add('error');
+        return;
+      }
+
+      if (value === correctCode) {
+        hideTryAgainGif();
+        msg.textContent = 'Code correct ! La serrure s\'ouvre… 🎁';
+        msg.classList.add('success');
+        setTimeout(() => goToStep(5), 1200);
+      } else {
+        msg.textContent = 'Ce n\'est pas le bon code… revérifie les chiffres !';
+        msg.classList.add('error');
+        showTryAgainGif();
+      }
+    }
+
+    /* -------- MISSION SECRÈTE (dans la même page) -------- */
+
+    function startMission() {
+      // changer la photo d’en-tête par la photo famille
+      const header = document.getElementById('headerPhoto');
+      if (header) header.src = 'famille.jpg';
+
+      currentMission = 1;
+      showMission(currentMission);
+      goToStep(6);
+    }
+
+    function showMission(num) {
+      for (let i = 1; i <= maxMission; i++) {
+        const block = document.getElementById('mission' + i);
+        if (block) block.classList.remove('active');
+      }
+      const current = document.getElementById('mission' + num);
+      if (current) current.classList.add('active');
+
+      const btn = document.getElementById('nextBtn');
+      if (num < maxMission) {
+        btn.textContent = 'Mission suivante ▶️';
+      } else {
+        btn.textContent = 'Mission terminée ✅';
+      }
+    }
+
+    function nextMission() {
+      if (currentMission < maxMission) {
+        currentMission++;
+        showMission(currentMission);
+      } else {
+        alert("Mission terminée ! Tu as réussi toutes les étapes, Agent Gladys 🔐🎁");
+      }
+    }
+
+    function showCardDetails() {
+      const bloc = document.getElementById('cardDetails');
+      const btn = document.getElementById('cardBtn');
+      if (bloc) bloc.style.display = 'block';
+      if (btn) {
+        btn.disabled = true;
+        btn.textContent = 'Mission révélée ✔️';
+      }
+    }
+  </script>
+</body>
+</html>
